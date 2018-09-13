@@ -43,6 +43,42 @@ func (mongo *Mongo) Insert(data *models.GenericData) (*models.GenericData, error
 	return data, nil
 }
 
+// GetByID rreturns object with given ID
+func (mongo *Mongo) GetByID(id bson.ObjectId) (*models.GenericData, error) {
+	result := &models.GenericData{}
+	if err := mongo.Collection.Find(bson.M{"_id": id}).One(&result); err != nil {
+		return nil, fmt.Errorf("error in gettign record in GetByID %v", err)
+	}
+	return result, nil
+}
+
+// See models/genericModel.go for how updates are represented in a struct.
+
+// Returns updated record if it worked
+func (mongo *Mongo) Update(id bson.ObjectId, updates *models.Updates) (*models.GenericData, error) {
+	recordToUpdate, err := mongo.GetByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("error getting record to be updated: %v", err)
+	}
+	change := mgo.Change{
+		Update:    bson.M{"$set": recordToUpdate},
+		ReturnNew: true,
+	}
+	result := &models.GenericData{}
+	if _, err := mongo.Collection.FindId(id).Apply(change, result); err != nil {
+		return nil, fmt.Errorf("error updating record: %v", err)
+	}
+	return result, nil
+}
+
+// Delete record
+func (mongo *Mongo) Delete(id bson.ObjectId) error {
+	if err := mongo.Collection.RemoveId(id); err != nil {
+		return fmt.Errorf("error deleting record: %v", err)
+	}
+	return nil
+}
+
 // GetAll returns all the data in the database
 func (mongo *Mongo) GetAll() ([]*models.GenericData, error) {
 	data := []*models.GenericData{}

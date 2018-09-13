@@ -14,6 +14,9 @@ export TLSKEY=$(pwd)/TLS/privkey.pem
 
 # turned off so I don't have to keep adding dummy data
 #docker rm -f mongo-server
-docker run -d --name mongo-server -p 27017:27017 mongo
+output=$(docker ps --filter name="mongo-server" -q)
+if [[ -z "$output" ]]; then
+	docker run -d --name mongo-server -p 27017:27017 mongo
+fi
 go build
 ./bloggo
