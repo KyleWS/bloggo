@@ -6,16 +6,23 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/KyleWS/bloggo/handlers"
-	"github.com/KyleWS/bloggo/models/database"
-
+	"github.com/KyleWS/chikkin-server/handlers"
+	"github.com/KyleWS/chikkin-server/models"
 	mgo "gopkg.in/mgo.v2"
 )
 
+/*
+DEBUG INSTRUCTIONS:
+To debug in vscode you need to do the following things
+1. Set default addr to 2555 (not 443 because it is running locally)
+2. Comment out the TLS variables
+3. Hardcode TLS path or run program with ListenAndServe instead of ListenAndServeTLS
+*/
+
 const defaultAddr = ":443"
 const defaultMongo = "localhost:27017"
-const defaultMongoDBName = "DefaultDB"
-const defaultMongoColName = "DefaultCol"
+const defaultMongoDBName = "chikkin-db"
+const defaultMongoColName = "chikkin-locations-collection-v1"
 
 // See context.go for basic context management
 // See cors.go for basic middleware management
@@ -39,11 +46,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("error dialing mongo database. check that the provided URL is reachable from this program: %v", err)
 	}
-	mongoDatabase := database.NewMongoStore(mongoSess, defaultMongoDBName, defaultMongoColName)
+	mongoDatabase := models.NewMongoStore(mongoSess, defaultMongoDBName, defaultMongoColName)
 	handlerContext := handlers.NewHandlerContext(*mongoDatabase)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handlerContext.DefaultHandler)
+	mux.HandleFunc("/location", handlerContext.LocationRequestHandler)
 
 	// Serving static files can be done with this format.
 	//dir := http.Dir("/images") // This file must be created

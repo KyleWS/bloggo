@@ -19,4 +19,4 @@ if [[ -z "$output" ]]; then
 	docker run -d --name mongo-server -p 27017:27017 mongo
 fi
 go build
-./bloggo
+./chikkin-server

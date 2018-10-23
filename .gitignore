@@ -1,2 +1,7 @@
 TLS/*
 config/*
+.vscode/
+acquire_resources
+deploy.sh
+.DS_Store
+chikkin-server

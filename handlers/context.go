@@ -1,14 +1,16 @@
 package handlers
 
-import "github.com/KyleWS/bloggo/models/database"
+import (
+	"github.com/KyleWS/chikkin-server/models"
+)
 
 // Default Context and CORS structs/handlers to facilitate
 // bare requirements for request handling.
 type Context struct {
-	db database.Mongo
+	db models.Mongo
 }
 
-func NewHandlerContext(mongo database.Mongo) *Context {
+func NewHandlerContext(mongo models.Mongo) *Context {
 	return &Context{
 		db: mongo,
 	}
